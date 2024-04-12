@@ -286,8 +286,12 @@ void backtrace(std::stringstream& bt, CONTEXT* ctx)
     // the PC to that address.
     // i.e. symbol->addr is the start of the function and
     // displacement is the offset of the pc into that function
-    dbg.SymFromAddr(process, (ULONG64)stack.AddrPC.Offset, &displacement,
-                    pSymbol);
+    if (!dbg.SymFromAddr(process, (ULONG64)stack.AddrPC.Offset, &displacement,
+                         pSymbol)) {
+      bt << "\tunknown pc 0x" << std::hex << (ULONG64)stack.AddrPC.Offset
+         << "\r\n";
+      continue;
+    }
 
     IMAGEHLP_LINE64 line{};
     line.SizeOfStruct = sizeof(line);
